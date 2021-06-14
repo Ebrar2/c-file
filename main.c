@@ -1,44 +1,58 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include<string.h>
-#define dosyaA "giris.txt"
+#define dosyaA "akademik.txt"
 int main()
 {
     FILE *dosya,*dosya2;
-    char buf[50],kartno[50][50];
-    int a=0,i=0,j=0;
+    int a=0,i=0,j=0,say=0;
+    char gec[12][50],buf[50];
     dosya=fopen(dosyaA,"r");
     if(dosya==NULL)
     {
-        printf("DOSYA ACILAMADI!!!");
+        printf("%s ADLI DOSYA ACILAMADI!!!\n",dosyaA);
         exit(1);
     }
-    dosya2=fopen("casus.txt","w");
+    dosya2=fopen("eposta.txt","w");
     if(dosya2==NULL)
     {
-        printf("DOSYA ACILAMADI!!!");
+        printf("'eposta.txt' ADLI DOSYA ACILAMADI!!!\n");
         exit(1);
     }
     while(fgets(buf,50,dosya)!=NULL)
     {
-        strcpy(kartno[a],buf);
-        printf("i:%d kartno:%s\n",a,kartno[a]);
+        strcpy(gec[a],buf);
         a++;
     }
-    for(i=0;i<a;i++)
+    for(i=0;i<12;i++)
     {
-        printf("\nk[i]:%s",kartno[i]);
-        for(j=i+1;j<a;j++)
-        {
-            if(strcmp(kartno[i],kartno[j])==0)
-              {
-                  printf("\nAYNI:%s",kartno[j]);
-                  fprintf(dosya2,"%s\n",kartno[j]);
-              }
-            }
+        for(j=i+1;j<12;j++)
+       {
+           if(strcmp(gec[i],gec[j])==0)
+           {
+               strcpy(gec[j],"TEKRAR");
+           }
+
+       }
     }
-    printf("\nISLEM BITTI!!!");
-    fclose(dosya2);
+    char x[6]="TEKRAR";
+    for(i=0;i<12;i++)
+    {
+        say=0;
+        printf("\ngec[i]:%s",gec[i]);
+        for(j=0;j<6;j++)
+        {
+            if(gec[i][j]==x[j])
+                say++;
+        }
+        if(say==0)
+        {
+             printf("\ngec[i]:%s",gec[i]);
+             fprintf(dosya2,"%s",gec[i]);
+        }
+    }
+    printf("\n\nISLEM BITTI!!!");
     fclose(dosya);
+    fclose(dosya2);
     return 0;
 }
