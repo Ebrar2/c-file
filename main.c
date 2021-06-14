@@ -2,76 +2,137 @@
 #include <stdlib.h>
 #include<string.h>
 #include<ctype.h>
-struct telefon
+struct hayvan
 {
-    char ad[20];
-    char ad2[20];
-    float fiyat;
+    int satir;
+    int sutun;
+    int kalem;
+    int yon;
 };
-void ayir(struct telefon *t,char *buf)
+void ayristir(int *komut1,int *komut2,char *komut)
 {
     char *p;
-    p=strtok(buf," ");
-    strcpy(t->ad,p);
-    p=strtok(NULL," ");
-    strcpy(t->ad2,p);
-    p=strtok(NULL," ");
-    t->fiyat=atof(p);
+    p=strtok(komut,",");
+    if(p!=NULL)
+   {
+     *komut1=atoi(p);
+     p=strtok(NULL,",");
+     *komut2=atoi(p);
+   }
+   else
+   {
+      * komut1=atoi(komut);
+      * komut2=0;
+   }
+   printf("\nkomut1:%d  komut2:%d",*komut1,*komut2);
 }
-void ucuzPahali(struct telefon t[],int n)
+void gez(struct hayvan *t,char oda[][50],int komut1,int komut2)
 {
-    FILE *ucuz,*pahali;
-    int i;
-    float top=0.0,ort;
-    ucuz=fopen("ucuz.txt","w");
-    if(ucuz==NULL)
+    int i,a,b;
+    a=t->satir;
+    b=t->sutun;
+    if(komut2==0)
     {
-        printf("\n\nucuz.txt ADLI DOSYA ACILAMADI");
-        exit(1);
-    }
-    pahali=fopen("pahali.txt","w");
-    if(pahali==NULL)
-    {
-        printf("\n\npahali.txt ADLI DOSYA ACILAMADI");
-        exit(1);
-    }
-    for(i=0;i<n;i++)
-        top=top+t[i].fiyat;
-    ort=top/n;
-    printf("\nort:%.2f",ort);
-    for(i=0;i<n;i++)
-    {
-        if(t[i].fiyat<=ort)
-            fprintf(ucuz,"%s %s %.2f\n",t[i].ad,t[i].ad2,t[i].fiyat);
+        if(komut1==1 || komut1==2)
+              t->kalem=komut1;
         else
-            fprintf(pahali,"%s %s %.2f\n",t[i].ad,t[i].ad2,t[i].fiyat);
+              t->yon=komut1;
+    }
+    else
+    {
+        if(t->yon==3)
+        {
+            for(i=0;i<komut2 && i+t->sutun<50;i++)
+            {
+               if(t->kalem==1)
+                  oda[t->satir][t->sutun+i]='-';
+            }
+            a=t->satir;
+            b=t->sutun+i;
+        }
+        else if(t->yon==4)
+        {
+            for(i=0;i<komut2 && t->sutun-i>-1;i++)
+            {
+                 if(t->kalem==1)
+                    oda[t->satir][t->sutun-i]='-';
+            }
+            a=t->satir;
+            b=t->sutun-i;
+        }
+        else if(t->yon==5)
+        {
+            for(i=0;i<komut2 && t->satir-i>-1;i++)
+            {
+                if(t->kalem==1)
+                  oda[t->satir-i][t->sutun]='|';
+            }
+            a=t->satir-i;
+            b=t->sutun;
+        }
+        else if(t->yon==6)
+        {
+            for(i=0;i<komut2 && t->satir+i<20;i++)
+            {
+                if(t->kalem==1)
+                  oda[t->satir+i][t->sutun]='|';
+            }
+            a=t->satir+i;
+            b=t->sutun;
+        }
+    }
+    t->satir=a;
+    t->sutun=b;
+
+}
+void yaz(char oda[][50])
+{
+    int i,j;
+    FILE *dosya;
+    dosya=fopen("cizim.dat","w");
+    if(dosya==NULL)
+    {
+        printf("\n\ncizim.dat ADLI DOSYA ACILAMADI!!!");
+        exit(1);
+    }
+    char buf[50];
+    printf("\n\n\n\nKAPLUMBAGANIN IZLEDIGI YOL\n\n\n");
+    for(i=0;i<20;i++)
+    {
+        for(j=0;j<50;j++)
+          {
+            printf("%c",oda[i][j]);
+            buf[j]=oda[i][j];
+          }
+        printf("\n");
+        fprintf(dosya,"%s\n",buf);
 
     }
-    fclose(ucuz);
-    fclose(pahali);
+    fclose(dosya);
 }
 int main()
 {
-    FILE *fiyat;
-    char buf[100];
-    int a=0,i=0;
-    fiyat=fopen("fiyat.txt","r");
-    if(fiyat==NULL)
+    int komut1,komut2;
+    char oda[20][50]={' '};
+    char komut[20];
+    FILE *kaynak;
+    struct hayvan tosbaga={0,0,1,0};
+    kaynak=fopen("kaynak.dat","r");
+    if(kaynak==NULL)
     {
-        printf("fiyat.txt ADLI DOSYA ACILAMADI");
+        printf("\nkaynak.dat ADLI DOSYA ACILAMADI");
         exit(1);
     }
-    while(fgets(buf,100,fiyat)!=NULL)
-        a++;
-    struct telefon t[a];
-    fseek(fiyat,0,SEEK_SET);
-    while(fgets(buf,100,fiyat)!=NULL)
+    while(fgets(komut,20,kaynak)!=NULL)
     {
-        ayir(t+i,buf);
-        i++;
+        ayristir(&komut1,&komut2,komut);
+        gez(&tosbaga,oda,komut1,komut2);
+   printf("\nt->satir:%d t->sutun:%d",tosbaga.satir,tosbaga.sutun);
+   printf("\nt->kalem:%d t->yon:%d",tosbaga.kalem,tosbaga.yon);
     }
-    ucuzPahali(t,a);
-    fclose(fiyat);
-    printf("\n\nISLEM BITTT");
+    oda[tosbaga.satir][tosbaga.sutun]='*';
+    yaz(oda);
+    fclose(kaynak);
     return 0;
+
 }
