@@ -1,138 +1,51 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include<string.h>
 #include<ctype.h>
-struct hayvan
-{
-    int satir;
-    int sutun;
-    int kalem;
-    int yon;
-};
-void ayristir(int *komut1,int *komut2,char *komut)
-{
-    char *p;
-    p=strtok(komut,",");
-    if(p!=NULL)
-   {
-     *komut1=atoi(p);
-     p=strtok(NULL,",");
-     *komut2=atoi(p);
-   }
-   else
-   {
-      * komut1=atoi(komut);
-      * komut2=0;
-   }
-   printf("\nkomut1:%d  komut2:%d",*komut1,*komut2);
-}
-void gez(struct hayvan *t,char oda[][50],int komut1,int komut2)
-{
-    int i,a,b;
-    a=t->satir;
-    b=t->sutun;
-    if(komut2==0)
-    {
-        if(komut1==1 || komut1==2)
-              t->kalem=komut1;
-        else
-              t->yon=komut1;
-    }
-    else
-    {
-        if(t->yon==3)
-        {
-            for(i=0;i<komut2 && i+t->sutun<50;i++)
-            {
-               if(t->kalem==1)
-                  oda[t->satir][t->sutun+i]='-';
-            }
-            a=t->satir;
-            b=t->sutun+i;
-        }
-        else if(t->yon==4)
-        {
-            for(i=0;i<komut2 && t->sutun-i>-1;i++)
-            {
-                 if(t->kalem==1)
-                    oda[t->satir][t->sutun-i]='-';
-            }
-            a=t->satir;
-            b=t->sutun-i;
-        }
-        else if(t->yon==5)
-        {
-            for(i=0;i<komut2 && t->satir-i>-1;i++)
-            {
-                if(t->kalem==1)
-                  oda[t->satir-i][t->sutun]='|';
-            }
-            a=t->satir-i;
-            b=t->sutun;
-        }
-        else if(t->yon==6)
-        {
-            for(i=0;i<komut2 && t->satir+i<20;i++)
-            {
-                if(t->kalem==1)
-                  oda[t->satir+i][t->sutun]='|';
-            }
-            a=t->satir+i;
-            b=t->sutun;
-        }
-    }
-    t->satir=a;
-    t->sutun=b;
-
-}
-void yaz(char oda[][50])
-{
-    int i,j;
-    FILE *dosya;
-    dosya=fopen("cizim.dat","w");
-    if(dosya==NULL)
-    {
-        printf("\n\ncizim.dat ADLI DOSYA ACILAMADI!!!");
-        exit(1);
-    }
-    char buf[50];
-    printf("\n\n\n\nKAPLUMBAGANIN IZLEDIGI YOL\n\n\n");
-    for(i=0;i<20;i++)
-    {
-        for(j=0;j<50;j++)
-          {
-            printf("%c",oda[i][j]);
-            buf[j]=oda[i][j];
-          }
-        printf("\n");
-        fprintf(dosya,"%s\n",buf);
-
-    }
-    fclose(dosya);
-}
 int main()
 {
-    int komut1,komut2;
-    char oda[20][50]={' '};
-    char komut[20];
-    FILE *kaynak;
-    struct hayvan tosbaga={0,0,1,0};
-    kaynak=fopen("kaynak.dat","r");
-    if(kaynak==NULL)
+    char ad[20],buf[100];
+    FILE *dosya,*dosya2;
+    int i,j,k,say=0;
+    printf("Kisa mesaji iceren dosyanin adini giriniz:");
+    gets(ad);
+    dosya=fopen(ad,"r");
+    if(dosya==NULL)
     {
-        printf("\nkaynak.dat ADLI DOSYA ACILAMADI");
+        printf("\n%s ADLI DOSYA ACILAMADI!!!",ad);
         exit(1);
     }
-    while(fgets(komut,20,kaynak)!=NULL)
+    char d[8][5]={"ABC1","DEF1","GHI1","JKL1","MNO1","PQRS","TUV1","WXYZ"};
+    while(fgets(buf,100,dosya)!=NULL)
     {
-        ayristir(&komut1,&komut2,komut);
-        gez(&tosbaga,oda,komut1,komut2);
-   printf("\nt->satir:%d t->sutun:%d",tosbaga.satir,tosbaga.sutun);
-   printf("\nt->kalem:%d t->yon:%d",tosbaga.kalem,tosbaga.yon);
-    }
-    oda[tosbaga.satir][tosbaga.sutun]='*';
-    yaz(oda);
-    fclose(kaynak);
-    return 0;
+        for(i=0;buf[i]!='\0';i++)
+        {
+            if(buf[i]==' ' || isdigit(buf[i])==1)
+               {
+                  say++;
+               }
+            else
+            {
+                buf[i]=toupper(buf[i]);
+                for(j=0;j<8;j++)
+                {
+                    for(k=0;k<4;k++)
+                    {
+                           if(buf[i]==d[j][k])
+                              say=say+k+1;
+                    }
+            }
 
+        }
+        printf("\nbuf[i]:%c  say:%d",buf[i],say);
+    }
+    }
+    dosya2=fopen("frekans.txt","w");
+    if(dosya2==NULL)
+    {
+        printf("\n\nfrekans.txt ADLI DOSYA ACIAMADI");
+        exit(1);
+    }
+    fprintf(dosya2,"Toplam %d kez tusa basýlacaktýr",say);
+    printf("\nTus basma sayisini gosteren frekans.txt dosyasi olusturuldu");
+    return 0;
 }
