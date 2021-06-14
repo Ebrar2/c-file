@@ -1,51 +1,73 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include<string.h>
 #include<ctype.h>
+struct kalori
+{
+    char yiyecek[20];
+    float kalori;
+};
+struct siparis
+{
+    char yiyecek[20];
+    float adet;
+};
 int main()
 {
-    char ad[20],buf[100];
     FILE *dosya,*dosya2;
-    int i,j,k,say=0;
-    printf("Kisa mesaji iceren dosyanin adini giriniz:");
-    gets(ad);
-    dosya=fopen(ad,"r");
+    float toplamKalr=0.0;
+    char buf[100],*p;
+    int a=0,b=0,i,j=0;
+    dosya=fopen("kalori.txt","r");
+    dosya2=fopen("siparis.txt","r");
     if(dosya==NULL)
     {
-        printf("\n%s ADLI DOSYA ACILAMADI!!!",ad);
+        printf("\nkalori.txt ADLI DOSYA ACILAMADI!!!");
         exit(1);
     }
-    char d[8][5]={"ABC1","DEF1","GHI1","JKL1","MNO1","PQRS","TUV1","WXYZ"};
-    while(fgets(buf,100,dosya)!=NULL)
-    {
-        for(i=0;buf[i]!='\0';i++)
-        {
-            if(buf[i]==' ' || isdigit(buf[i])==1)
-               {
-                  say++;
-               }
-            else
-            {
-                buf[i]=toupper(buf[i]);
-                for(j=0;j<8;j++)
-                {
-                    for(k=0;k<4;k++)
-                    {
-                           if(buf[i]==d[j][k])
-                              say=say+k+1;
-                    }
-            }
-
-        }
-        printf("\nbuf[i]:%c  say:%d",buf[i],say);
-    }
-    }
-    dosya2=fopen("frekans.txt","w");
     if(dosya2==NULL)
     {
-        printf("\n\nfrekans.txt ADLI DOSYA ACIAMADI");
+        printf("\nsiparis.txt ADLI DOSYA ACILAMADI!!!");
         exit(1);
     }
-    fprintf(dosya2,"Toplam %d kez tusa basýlacaktýr",say);
-    printf("\nTus basma sayisini gosteren frekans.txt dosyasi olusturuldu");
+    while(fgets(buf,100,dosya)!=NULL)
+        a++;
+    fseek(dosya,0,SEEK_SET);
+    struct kalori k[a];
+    while(fgets(buf,100,dosya2)!=NULL)
+        b++;
+    fseek(dosya2,0,SEEK_SET);
+    struct siparis s[b];
+    while(fgets(buf,100,dosya)!=NULL)
+    {
+        p=strtok(buf," ");
+        strcpy(k[j].yiyecek,p);
+        p=strtok(NULL," ");
+        k[j].kalori=atof(p);
+       // printf("\nk[j].yiyecek:%s    k[j].kalori:%.2f",k[j].yiyecek,k[j].kalori);
+        j++;
+    }
+    j=0;
+    printf("\n");
+    while(fgets(buf,100,dosya2)!=NULL)
+    {
+        p=strtok(buf," ");
+        strcpy(s[j].yiyecek,p);
+        p=strtok(NULL," ");
+        s[j].adet=atof(p);
+       // printf("\ns[j].yiyecek:%s s[j]:%.2f",s[j].yiyecek,s[j].adet);
+        for(i=0;i<a;i++)
+        {
+            if(strcmp(s[j].yiyecek,k[i].yiyecek)==0)
+            {
+                toplamKalr=k[i].kalori*s[j].adet+toplamKalr;
+                break;
+            }
+        }
+        j++;
+    }
+    printf("\n\n\nTOPLAM KALORI:%.2f",toplamKalr);
+    fclose(dosya2);
+    fclose(dosya);
     return 0;
 }
